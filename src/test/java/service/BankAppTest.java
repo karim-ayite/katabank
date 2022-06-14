@@ -22,7 +22,7 @@ class BankAppTest {
 
     private final Clock clock = Clock.fixed(Instant.parse("2022-01-01T00:00:00Z"), ZoneId.of("UTC"));
 
-    private final AccountOperationService withdrawlOperationService = new WithdrawalService(clock);
+    private final AccountOperationService withdrawalOperationService = new WithdrawalService(clock);
 
     private final AccountOperationService depositOperationService = new DepositService(clock);
 
@@ -50,7 +50,7 @@ class BankAppTest {
         customerAccount.setAccountNumber("7");
         customerAccount.setBalance(BigDecimal.ZERO);
 
-        withdrawlOperationService.performOperation(customerAccount, new BigDecimal(1000));
+        withdrawalOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
         var printer = new StringAccountPrinter();
 
@@ -67,9 +67,9 @@ class BankAppTest {
         customerAccount.setBalance(BigDecimal.ZERO);
         
 
-        withdrawlOperationService.performOperation(customerAccount, new BigDecimal(1000));
+        withdrawalOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        withdrawlOperationService.performOperation(customerAccount, new BigDecimal(1000));
+        withdrawalOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
         depositOperationService.performOperation(customerAccount, new BigDecimal(4000));
 
@@ -97,13 +97,13 @@ class BankAppTest {
     }
 
     @Test
-    void shouldAddAndSubstractDepositAndWithdrawAmountFromAccountBalance() {
+    void shouldAddAndSubtractDepositAndWithdrawAmountFromAccountBalance() {
 
         Account account = new Account();
         account.setAccountNumber("1");
         account.setBalance(BigDecimal.ZERO);
 
-        withdrawlOperationService.performOperation(account, new BigDecimal(1000));
+        withdrawalOperationService.performOperation(account, new BigDecimal(1000));
 
         Assertions.assertEquals(new BigDecimal(-1000),account.getBalance());
 
@@ -119,7 +119,7 @@ class BankAppTest {
         account.setAccountNumber("1");
         account.setBalance(BigDecimal.ZERO);
 
-        withdrawlOperationService.performOperation(account, new BigDecimal(1000));
+        withdrawalOperationService.performOperation(account, new BigDecimal(1000));
 
         depositOperationService.performOperation(account, new BigDecimal(2000));
 
@@ -146,7 +146,7 @@ class BankAppTest {
         account.setAccountNumber("1");
         account.setBalance(BigDecimal.ZERO);
 
-        withdrawlOperationService.performOperation(account, new BigDecimal(1000));
+        withdrawalOperationService.performOperation(account, new BigDecimal(1000));
 
         var withdrawalOperation = account.getOperations().stream()
                 .filter(accountOperation -> accountOperation.getOperationType() == OperationType.WITHDRAWAL && new BigDecimal(1000).equals(accountOperation.getAmount()))

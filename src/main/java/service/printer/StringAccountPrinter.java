@@ -12,10 +12,14 @@ public class StringAccountPrinter implements AccountPrinter {
 
     public static final String ACCOUNT_NUMBER_LABEL = "Account number : ";
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String BALANCE_LABEL = "Balance";
+    public static final String CREATION_DATE_LABEL = "Creation date";
+    public static final String OPERATION_LABEL = "Operation";
+    public static final String AMOUNT_LABEL = "Amount";
 
     @Override
     public String printAccountAndBalance(Account customerAccount) {
-        return ACCOUNT_NUMBER_LABEL + customerAccount.getAccountNumber() + " | Balance = " + getBalanceAsString(customerAccount.getBalance());
+        return ACCOUNT_NUMBER_LABEL + customerAccount.getAccountNumber() + " | " + BALANCE_LABEL + " = " + getBalanceAsString(customerAccount.getBalance());
     }
 
     @Override
@@ -37,7 +41,7 @@ public class StringAccountPrinter implements AccountPrinter {
         String actionLabel = getActionAsString(accountOperation);
         String creationDate = getCreationDateAsString(accountOperation, formatter);
         String amount = getAmountAsString(accountOperation);
-        String balance = "\n Balance : "+getBalanceAsString(accountOperation.getCurrentAccountBalance());
+        String balance = "\n " + BALANCE_LABEL + " : " +getBalanceAsString(accountOperation.getCurrentAccountBalance());
         return  actionLabel  + creationDate  + amount  + balance + "\n ------------------------------------ ";
     }
 
@@ -46,16 +50,16 @@ public class StringAccountPrinter implements AccountPrinter {
     }
 
     private String getCreationDateAsString(AccountOperation accountOperation, DateTimeFormatter formatter) {
-        return "\n Creation date : "+accountOperation.getCreationDate().format(formatter);
+        return "\n " + CREATION_DATE_LABEL + " : " +accountOperation.getCreationDate().format(formatter);
     }
 
     private String getActionAsString(AccountOperation accountOperation) {
-        return "\n Operation : "+accountOperation.getOperationType().name();
+        return "\n " + OPERATION_LABEL + " : " +accountOperation.getOperationType().name();
     }
 
     private String getAmountAsString(AccountOperation accountOperation) {
          var amountAsString = accountOperation.getOperationType() == OperationType.DEPOSIT ? getBalanceAsString(accountOperation.getAmount()) : getBalanceAsString(accountOperation.getAmount().multiply(new BigDecimal(-1)));
-        return "\n Amount : "+amountAsString;
+        return "\n " + AMOUNT_LABEL + " : " +amountAsString;
     }
 
 
