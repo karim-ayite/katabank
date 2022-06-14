@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import service.operation.BalanceOperationService;
 import service.operation.DepositService;
 import service.operation.WithdrawalService;
+import service.printer.AccountPrinterService;
 import service.printer.StringAccountPrinterService;
 
 import java.math.BigDecimal;
@@ -25,6 +26,7 @@ class BankAppTest {
     private final BalanceOperationService withdrawalOperationService = new WithdrawalService(clock);
 
     private final BalanceOperationService depositOperationService = new DepositService(clock);
+    private final AccountPrinterService stringAccountPrinterService = new StringAccountPrinterService();
 
     @Test
     @DisplayName("US 1 - should make a deposit")
@@ -36,10 +38,7 @@ class BankAppTest {
       
         depositOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        var printer = new StringAccountPrinterService();
-
-        Assertions.assertEquals("Account number : 1 | Balance = 1000", printer.printAccountAndBalance(customerAccount));
-
+        Assertions.assertEquals("Account number : 1 | Balance = 1000", stringAccountPrinterService.printAccountAndBalance(customerAccount));
     }
 
     @Test
@@ -52,10 +51,7 @@ class BankAppTest {
 
         withdrawalOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        var printer = new StringAccountPrinterService();
-
-        Assertions.assertEquals("Account number : 7 | Balance = -1000", printer.printAccountAndBalance(customerAccount));
-
+        Assertions.assertEquals("Account number : 7 | Balance = -1000", stringAccountPrinterService.printAccountAndBalance(customerAccount));
     }
 
     @Test
