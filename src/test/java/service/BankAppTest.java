@@ -1,131 +1,160 @@
 package service;
 
-import model.AccountOperation;
-import model.Customer;
-import model.CustomerAction;
+import model.Account;
+import model.OperationType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import service.operation.AccountOperationService;
+import service.operation.DepositService;
+import service.operation.WithdrawalService;
+import service.printer.StringAccountPrinter;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@ExtendWith(MockitoExtension.class)
-public class BankAppTest {
+class BankAppTest {
+
+    private final Clock clock = Clock.fixed(Instant.parse("2022-01-01T00:00:00Z"), ZoneId.of("UTC"));
+
+    private final AccountOperationService withdrawlOperationService = new WithdrawalService(clock);
+
+    private final AccountOperationService depositOperationService = new DepositService(clock);
 
     @Test
-    public void test_US1() {
-        Customer aCustomer = new Customer();
-        aCustomer.setUsername("username6");
-        aCustomer.setPassword("password6");
+    @DisplayName("US 1 - should make a deposit")
+    void shouldMakeADeposit() {
 
-        CustomerAuthenticatorService customerAuthenticatorService = BasicCustomerAuthenticatorService.getInstance();
+        var customerAccount = new Account();
+        customerAccount.setAccountNumber("1");
+        customerAccount.setBalance(BigDecimal.ZERO);
+      
+        depositOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        var isCustomerAuthenticate = customerAuthenticatorService.authenticate(aCustomer);
+        var printer = new StringAccountPrinter();
 
-        Assertions.assertEquals(true, isCustomerAuthenticate);
-
-        CustomerFinderService customerFinderService = CustomerFinderServiceImp.getInstance();
-        var optionalCustomer = customerFinderService.findCustomerByUsername(aCustomer.getUsername());
-
-        if (optionalCustomer.isPresent()) {
-            aCustomer = optionalCustomer.get();
-
-            AccountOperation accountOperation = new AccountOperation();
-            accountOperation.setAction(CustomerAction.DEPOSIT);
-            accountOperation.setAmount(new BigDecimal(1000));
-
-            AccountOperationPerformer.getInstance().perform(aCustomer.getAccount(), accountOperation);
-
-            var printer = new Printer();
-
-            Assertions.assertEquals("Account number : account6 | Balance = 1000", printer.printAccount(aCustomer.getAccount()));
-        }
+        Assertions.assertEquals("Account number : 1 | Balance = 1000", printer.printAccountAndBalance(customerAccount));
 
     }
 
     @Test
-    public void test_US2() {
+    @DisplayName("US 2 - should make a withdrawal")
+    void shouldMakeAWithdraw() {
 
-        Customer aCustomer = new Customer();
-        aCustomer.setUsername("username7");
-        aCustomer.setPassword("password7");
+        var customerAccount = new Account();
+        customerAccount.setAccountNumber("7");
+        customerAccount.setBalance(BigDecimal.ZERO);
 
-        var isCustomerAuthenticate = BasicCustomerAuthenticatorService.getInstance().authenticate(aCustomer);
+        withdrawlOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        Assertions.assertEquals(true, isCustomerAuthenticate);
+        var printer = new StringAccountPrinter();
 
-        var optionalCustomer = ((CustomerFinderService) CustomerFinderServiceImp.getInstance()).findCustomerByUsername(aCustomer.getUsername());
+        Assertions.assertEquals("Account number : 7 | Balance = -1000", printer.printAccountAndBalance(customerAccount));
 
-        if (optionalCustomer.isPresent()) {
-            aCustomer = optionalCustomer.get();
-
-            AccountOperation accountOperation = new AccountOperation();
-            accountOperation.setAction(CustomerAction.WITHDRAWAL);
-            accountOperation.setAmount(new BigDecimal(1000));
-
-            AccountOperationPerformer.getInstance().perform(aCustomer.getAccount(), accountOperation);
-
-            var printer = new Printer();
-
-            Assertions.assertEquals("Account number : account7 | Balance = -1000", printer.printAccount(aCustomer.getAccount()));
-        }
     }
 
     @Test
-    public void test_US3() {
-        Customer aCustomer = new Customer();
-        aCustomer.setUsername("username3");
-        aCustomer.setPassword("password3");
+    @DisplayName("US 3 - should print a history")
+    void shouldPrintAHistory() {
+     
+        var customerAccount = new Account();
+        customerAccount.setAccountNumber("1");
+        customerAccount.setBalance(BigDecimal.ZERO);
+        
 
-        CustomerAuthenticatorService customerAuthenticatorService = BasicCustomerAuthenticatorService.getInstance();
+        withdrawlOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        var isCustomerAuthenticate = customerAuthenticatorService.authenticate(aCustomer);
+        withdrawlOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        Assertions.assertEquals(true, isCustomerAuthenticate);
+        depositOperationService.performOperation(customerAccount, new BigDecimal(4000));
 
-        CustomerFinderService customerFinderService = CustomerFinderServiceImp.getInstance();
-        var optionalCustomer = customerFinderService.findCustomerByUsername(aCustomer.getUsername());
+        var printer = new StringAccountPrinter();
 
-        if (optionalCustomer.isPresent()) {
-            aCustomer = optionalCustomer.get();
+        String expectedHistory = """
+                Account number : 1
 
-            AccountOperation accountOperation = new AccountOperation();
-            accountOperation.setAction(CustomerAction.WITHDRAWAL);
-            accountOperation.setAmount(new BigDecimal(1000));
-            AccountOperationPerformer.getInstance().perform(aCustomer.getAccount(), accountOperation);
+                 Operation : WITHDRAWAL
+                 Creation date : 2022-01-01 00:00:00
+                 Amount : -1000
+                 Balance : -1000
+                 ------------------------------------\s
+                 Operation : WITHDRAWAL
+                 Creation date : 2022-01-01 00:00:00
+                 Amount : -1000
+                 Balance : -2000
+                 ------------------------------------\s
+                 Operation : DEPOSIT
+                 Creation date : 2022-01-01 00:00:00
+                 Amount : 4000
+                 Balance : 2000
+                 ------------------------------------\s""";
+        Assertions.assertEquals(expectedHistory, printer.printHistory(customerAccount));
+    }
 
-            accountOperation = new AccountOperation();
-            accountOperation.setAction(CustomerAction.WITHDRAWAL);
-            accountOperation.setAmount(new BigDecimal(1000));
-            AccountOperationPerformer.getInstance().perform(aCustomer.getAccount(), accountOperation);
+    @Test
+    void shouldAddAndSubstractDepositAndWithdrawAmountFromAccountBalance() {
 
-            accountOperation = new AccountOperation();
-            accountOperation.setAction(CustomerAction.DEPOSIT);
-            accountOperation.setAmount(new BigDecimal(4000));
-            AccountOperationPerformer.getInstance().perform(aCustomer.getAccount(), accountOperation);
+        Account account = new Account();
+        account.setAccountNumber("1");
+        account.setBalance(BigDecimal.ZERO);
 
-            var printer = new Printer();
+        withdrawlOperationService.performOperation(account, new BigDecimal(1000));
 
-            String expectedHistory = "\n Operation : WITHDRAWAL\n" +
-                    " Creation date : 2022-01-01 00:00:00\n" +
-                    " Amount : -1000\n" +
-                    " Balance : -1000\n" +
-                    " ------------------------------------ \n" +
-                    " Operation : WITHDRAWAL\n" +
-                    " Creation date : 2022-01-01 00:00:00\n" +
-                    " Amount : -1000\n" +
-                    " Balance : -2000\n" +
-                    " ------------------------------------ \n" +
-                    " Operation : DEPOSIT\n" +
-                    " Creation date : 2022-01-01 00:00:00\n" +
-                    " Amount : 4000\n" +
-                    " Balance : 2000\n" +
-                    " ------------------------------------ ";
+        Assertions.assertEquals(new BigDecimal(-1000),account.getBalance());
 
-            Assertions.assertEquals(expectedHistory, printer.printAccountHistory(aCustomer.getAccount()));
-        }
+        depositOperationService.performOperation(account, new BigDecimal(2000));
+
+        Assertions.assertEquals(new BigDecimal(1000),account.getBalance());
+    }
+
+    @Test
+    void shouldAddOperationsToAccount() {
+
+        Account account = new Account();
+        account.setAccountNumber("1");
+        account.setBalance(BigDecimal.ZERO);
+
+        withdrawlOperationService.performOperation(account, new BigDecimal(1000));
+
+        depositOperationService.performOperation(account, new BigDecimal(2000));
+
+        var withdrawalOperation = account.getOperations().stream()
+                .filter(accountOperation -> accountOperation.getOperationType() == OperationType.WITHDRAWAL && new BigDecimal(1000).equals(accountOperation.getAmount()))
+                .findFirst();
+
+        var depositOperation = account.getOperations().stream()
+                .filter(accountOperation -> accountOperation.getOperationType() == OperationType.DEPOSIT && new BigDecimal(2000).equals(accountOperation.getAmount()))
+                .findFirst();
+
+        Assertions.assertEquals(2,account.getOperations().size());
+
+        assertTrue(withdrawalOperation.isPresent());
+
+
+        assertTrue(depositOperation.isPresent());
+    }
+
+    @Test
+    void shouldHaveOperationsAddedValid() {
+
+        Account account = new Account();
+        account.setAccountNumber("1");
+        account.setBalance(BigDecimal.ZERO);
+
+        withdrawlOperationService.performOperation(account, new BigDecimal(1000));
+
+        var withdrawalOperation = account.getOperations().stream()
+                .filter(accountOperation -> accountOperation.getOperationType() == OperationType.WITHDRAWAL && new BigDecimal(1000).equals(accountOperation.getAmount()))
+                .findFirst();
+
+        assertTrue(withdrawalOperation.isPresent());
+
+        withdrawalOperation.ifPresent(accountOperation -> Assertions.assertNotNull(accountOperation.getCreationDate()));
     }
 
 }
