@@ -5,7 +5,7 @@ import model.OperationType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import service.operation.AccountOperationService;
+import service.operation.BalanceOperationService;
 import service.operation.DepositService;
 import service.operation.WithdrawalService;
 import service.printer.StringAccountPrinter;
@@ -22,9 +22,9 @@ class BankAppTest {
 
     private final Clock clock = Clock.fixed(Instant.parse("2022-01-01T00:00:00Z"), ZoneId.of("UTC"));
 
-    private final AccountOperationService withdrawalOperationService = new WithdrawalService(clock);
+    private final BalanceOperationService withdrawalOperationService = new WithdrawalService(clock);
 
-    private final AccountOperationService depositOperationService = new DepositService(clock);
+    private final BalanceOperationService depositOperationService = new DepositService(clock);
 
     @Test
     @DisplayName("US 1 - should make a deposit")

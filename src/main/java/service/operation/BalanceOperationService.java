@@ -4,7 +4,7 @@ import model.Account;
 
 import java.math.BigDecimal;
 
-public interface AccountOperationService {
+public interface BalanceOperationService {
 
      void performOperation(Account account, BigDecimal amount);
 }

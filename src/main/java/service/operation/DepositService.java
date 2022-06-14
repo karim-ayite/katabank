@@ -6,7 +6,7 @@ import model.OperationType;
 import java.math.BigDecimal;
 import java.time.Clock;
 
-public class DepositService extends AbstractAccountOperationService {
+public class DepositService extends AbstractBalanceOperationService {
 
     public DepositService(Clock clock) {
         super(clock);

@@ -8,10 +8,10 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
-public abstract class AbstractAccountOperationService implements AccountOperationService{
+public abstract class AbstractBalanceOperationService implements BalanceOperationService {
 
 
-    protected AbstractAccountOperationService(Clock clock) {
+    protected AbstractBalanceOperationService(Clock clock) {
         this.clock = clock;
     }
     protected  Clock clock;
