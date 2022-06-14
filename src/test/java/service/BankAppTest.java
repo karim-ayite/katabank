@@ -1,14 +1,14 @@
 package service;
 
 import model.Account;
-import model.OperationType;
+import model.BalanceOperationType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.operation.BalanceOperationService;
 import service.operation.DepositService;
 import service.operation.WithdrawalService;
-import service.printer.StringAccountPrinter;
+import service.printer.StringAccountPrinterService;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -36,7 +36,7 @@ class BankAppTest {
       
         depositOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        var printer = new StringAccountPrinter();
+        var printer = new StringAccountPrinterService();
 
         Assertions.assertEquals("Account number : 1 | Balance = 1000", printer.printAccountAndBalance(customerAccount));
 
@@ -52,7 +52,7 @@ class BankAppTest {
 
         withdrawalOperationService.performOperation(customerAccount, new BigDecimal(1000));
 
-        var printer = new StringAccountPrinter();
+        var printer = new StringAccountPrinterService();
 
         Assertions.assertEquals("Account number : 7 | Balance = -1000", printer.printAccountAndBalance(customerAccount));
 
@@ -73,7 +73,7 @@ class BankAppTest {
 
         depositOperationService.performOperation(customerAccount, new BigDecimal(4000));
 
-        var printer = new StringAccountPrinter();
+        var printer = new StringAccountPrinterService();
 
         String expectedHistory = """
                 Account number : 1
@@ -124,11 +124,11 @@ class BankAppTest {
         depositOperationService.performOperation(account, new BigDecimal(2000));
 
         var withdrawalOperation = account.getOperations().stream()
-                .filter(accountOperation -> accountOperation.getOperationType() == OperationType.WITHDRAWAL && new BigDecimal(1000).equals(accountOperation.getAmount()))
+                .filter(accountOperation -> accountOperation.getOperationType() == BalanceOperationType.WITHDRAWAL && new BigDecimal(1000).equals(accountOperation.getAmount()))
                 .findFirst();
 
         var depositOperation = account.getOperations().stream()
-                .filter(accountOperation -> accountOperation.getOperationType() == OperationType.DEPOSIT && new BigDecimal(2000).equals(accountOperation.getAmount()))
+                .filter(accountOperation -> accountOperation.getOperationType() == BalanceOperationType.DEPOSIT && new BigDecimal(2000).equals(accountOperation.getAmount()))
                 .findFirst();
 
         Assertions.assertEquals(2,account.getOperations().size());
@@ -149,7 +149,7 @@ class BankAppTest {
         withdrawalOperationService.performOperation(account, new BigDecimal(1000));
 
         var withdrawalOperation = account.getOperations().stream()
-                .filter(accountOperation -> accountOperation.getOperationType() == OperationType.WITHDRAWAL && new BigDecimal(1000).equals(accountOperation.getAmount()))
+                .filter(accountOperation -> accountOperation.getOperationType() == BalanceOperationType.WITHDRAWAL && new BigDecimal(1000).equals(accountOperation.getAmount()))
                 .findFirst();
 
         assertTrue(withdrawalOperation.isPresent());

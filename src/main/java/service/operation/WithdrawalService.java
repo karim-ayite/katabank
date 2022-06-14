@@ -1,7 +1,7 @@
 package service.operation;
 
 import model.Account;
-import model.OperationType;
+import model.BalanceOperationType;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -13,8 +13,8 @@ public class WithdrawalService extends AbstractBalanceOperationService {
     }
 
     @Override
-    protected OperationType getOperationType() {
-        return OperationType.WITHDRAWAL;
+    protected BalanceOperationType getOperationType() {
+        return BalanceOperationType.WITHDRAWAL;
     }
 
     @Override

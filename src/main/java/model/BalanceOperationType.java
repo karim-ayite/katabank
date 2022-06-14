@@ -1,6 +1,6 @@
 package model;
 
-public enum OperationType {
+public enum BalanceOperationType {
     DEPOSIT,
     WITHDRAWAL
 }

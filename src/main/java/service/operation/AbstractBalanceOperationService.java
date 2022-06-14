@@ -2,7 +2,7 @@ package service.operation;
 
 import model.Account;
 import model.AccountOperation;
-import model.OperationType;
+import model.BalanceOperationType;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -34,7 +34,7 @@ public abstract class AbstractBalanceOperationService implements BalanceOperatio
         account.addOperation(operation);
     }
 
-    protected abstract OperationType getOperationType();
+    protected abstract BalanceOperationType getOperationType();
 
     protected abstract void updateAccountBalance(Account account, BigDecimal amount) ;
 }

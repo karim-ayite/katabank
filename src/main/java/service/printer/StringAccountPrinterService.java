@@ -2,13 +2,13 @@ package service.printer;
 
 import model.Account;
 import model.AccountOperation;
-import model.OperationType;
+import model.BalanceOperationType;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 
-public class StringAccountPrinter implements AccountPrinter {
+public class StringAccountPrinterService implements AccountPrinterService {
 
     public static final String ACCOUNT_NUMBER_LABEL = "Account number : ";
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -58,7 +58,7 @@ public class StringAccountPrinter implements AccountPrinter {
     }
 
     private String getAmountAsString(AccountOperation accountOperation) {
-         var amountAsString = accountOperation.getOperationType() == OperationType.DEPOSIT ? getBalanceAsString(accountOperation.getAmount()) : getBalanceAsString(accountOperation.getAmount().multiply(new BigDecimal(-1)));
+         var amountAsString = accountOperation.getOperationType() == BalanceOperationType.DEPOSIT ? getBalanceAsString(accountOperation.getAmount()) : getBalanceAsString(accountOperation.getAmount().multiply(new BigDecimal(-1)));
         return "\n " + AMOUNT_LABEL + " : " +amountAsString;
     }
 

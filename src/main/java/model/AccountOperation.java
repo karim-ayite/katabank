@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class AccountOperation {
 
-    private OperationType operationType;
+    private BalanceOperationType balanceOperationType;
 
 
 
@@ -37,11 +37,11 @@ public class AccountOperation {
         this.creationDate = creationDate;
     }
 
-    public OperationType getOperationType() {
-        return operationType;
+    public BalanceOperationType getOperationType() {
+        return balanceOperationType;
     }
 
-    public void setOperationType(OperationType operationType) {
-        this.operationType = operationType;
+    public void setOperationType(BalanceOperationType balanceOperationType) {
+        this.balanceOperationType = balanceOperationType;
     }
 }
